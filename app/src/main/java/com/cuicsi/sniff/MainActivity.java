@@ -122,13 +122,13 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             final boolean ok = Root.hasRoot();
             ui.post(() -> {
-                txtRoot.setText(ok ? "ROOT ✓ 已获得超级用户权限" : "未获得 root —— 请先在 Magisk 里给本应用授权");
+                txtRoot.setText(ok ? "ROOT ✓ 已获得超级用户权限" : "未连接到本机 root 服务（请确认被控端 rc-agent 在运行）");
                 txtRoot.setTextColor(ContextCompat.getColor(this, ok ? R.color.accent : R.color.red));
                 if (!ok && firstRootCheck) {
                     firstRootCheck = false;
                     new AlertDialog.Builder(this)
                             .setTitle("需要 root 权限")
-                            .setMessage("系统抓包依赖 root 直接调用 tcpdump。\n\n请在 Magisk/KernelSU 里允许本应用获取超级用户权限，然后回到这里重试。")
+                            .setMessage("系统抓包依赖 root 直接调用 tcpdump。\n\n本应用通过本机 root 服务执行 tcpdump，请确认「远程被控端」正在运行后重试。")
                             .setPositiveButton("重试", (d, w) -> checkRoot())
                             .setNegativeButton("知道了", null)
                             .show();
