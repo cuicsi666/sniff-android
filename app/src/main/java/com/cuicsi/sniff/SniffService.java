@@ -96,8 +96,9 @@ public class SniffService extends Service {
     }
 
     private void stopCapture() {
-        Root.run("if [ -f " + PID_FILE + " ]; then kill -2 $(cat " + PID_FILE + ") 2>/dev/null; sleep 1; "
-                + "kill -9 $(cat " + PID_FILE + ") 2>/dev/null; rm -f " + PID_FILE + "; fi", 15);
+        // 直接按命令行杀，pid 文件在 su 环境里可能对不上
+        Root.run("pkill -2 -f 'tcpdump -i any' 2>/dev/null; sleep 1; "
+                + "pkill -9 -f 'tcpdump -i any' 2>/dev/null; rm -f " + PID_FILE, 20);
         running = false;
     }
 
