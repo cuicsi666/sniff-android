@@ -166,15 +166,12 @@ public class MainActivity extends AppCompatActivity {
             i.putExtra(SniffService.EXTRA_FILTER, filter);
             ContextCompat.startForegroundService(this, i);
 
-            boolean ok = false;
-            for (int k = 0; k < 6 && !ok; k++) {
+            boolean okTmp = false;
+            for (int k = 0; k < 6 && !okTmp; k++) {
                 try { Thread.sleep(800); } catch (InterruptedException ignored) { }
-                ok = isRunning();
-                if (!ok) {
-                    // 首次运行可能还在等 root 服务响应，再试
-                    continue;
-                }
+                okTmp = isRunning();
             }
+            final boolean ok = okTmp;
             ui.post(() -> {
                 btnStart.setEnabled(!ok);
                 btnStop.setEnabled(ok);
