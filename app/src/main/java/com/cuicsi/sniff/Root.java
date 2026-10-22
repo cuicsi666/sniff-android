@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.util.concurrent.TimeUnit;
+import android.util.Log;
 
 /** 通过 su 执行 root 命令 */
 public class Root {
@@ -17,6 +18,8 @@ public class Root {
     public static Result run(String cmd) {
         return run(cmd, 20);
     }
+
+    public static volatile String lastError = "";
 
     /** 本机 rc-agent 的令牌（它已以 root 运行，App 不必再申请 Magisk 授权） */
     private static final String AGENT = "http://127.0.0.1:8787/api/exec";
@@ -34,7 +37,7 @@ public class Root {
         java.net.HttpURLConnection c = null;
         try {
             java.net.URL url = new java.net.URL(AGENT);
-            c = (java.net.HttpURLConnection) url.openConnection();
+            c = (java.net.HttpURLConnection) url.openConnection(java.net.Proxy.NO_PROXY);
             c.setRequestMethod("POST");
             c.setDoOutput(true);
             c.setConnectTimeout(4000);
@@ -56,7 +59,9 @@ public class Root {
             r.out = extract(resp, "output");
             r.code = 0;
         } catch (Exception e) {
-            r.out = "执行失败：" + e.getMessage();
+            lastError = e.getClass().getSimpleName() + ": " + e.getMessage();
+            Log.e("SniffRoot", "agent exec failed", e);
+            r.out = "执行失败：" + lastError;
             r.code = -1;
         } finally {
             if (c != null) c.disconnect();

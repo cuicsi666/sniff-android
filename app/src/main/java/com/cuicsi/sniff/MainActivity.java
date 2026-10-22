@@ -122,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> {
             final boolean ok = Root.hasRoot();
             ui.post(() -> {
-                txtRoot.setText(ok ? "ROOT ✓ 已获得超级用户权限" : "未连接到本机 root 服务（请确认被控端 rc-agent 在运行）");
+                txtRoot.setText(ok ? "ROOT ✓ 已连接本机 root 服务" : "root 服务不可用：" + Root.lastError);
                 txtRoot.setTextColor(ContextCompat.getColor(this, ok ? R.color.accent : R.color.red));
                 if (!ok && firstRootCheck) {
                     firstRootCheck = false;
