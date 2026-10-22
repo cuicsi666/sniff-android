@@ -35,15 +35,23 @@ public class SniffService extends Service {
         startForegroundCompat();
 
         if (ACTION_STOP.equals(action)) {
-            stopCapture();
+            final boolean[] done = {false};
+            new Thread(() -> {
+                stopCapture();
+                done[0] = true;
+            }).start();
+            for (int i = 0; i < 40 && !done[0]; i++) {
+                try { Thread.sleep(100); } catch (InterruptedException ignored) { }
+            }
             stopForeground(true);
             stopSelf();
             return START_NOT_STICKY;
         }
         if (ACTION_START.equals(action)) {
-            String name = intent.getStringExtra(EXTRA_NAME);
-            String filter = intent.getStringExtra(EXTRA_FILTER);
-            startCapture(name, filter);
+            final String name = intent.getStringExtra(EXTRA_NAME);
+            final String filter = intent.getStringExtra(EXTRA_FILTER);
+            // 网络请求不能在主线程（NetworkOnMainThreadException）
+            new Thread(() -> startCapture(name, filter)).start();
         }
         return START_STICKY;
     }
